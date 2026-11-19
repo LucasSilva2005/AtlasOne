@@ -1,0 +1,40 @@
+﻿# Environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+
+# Node.js / Frontend
+node_modules/
+.next/
+dist/
+build/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Operating system
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak

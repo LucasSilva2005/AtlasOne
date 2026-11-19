@@ -1,0 +1,15 @@
+﻿services:
+  atlasone-api:
+    build:
+      context: ./backend/atlasone-api
+      dockerfile: Dockerfile
+    image: atlasone-api:1.0
+    container_name: atlasone-api
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/atlasone-api/.env
+    environment:
+      DB_URL: "jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=require"
+      SPRING_PROFILES_ACTIVE: development
+    restart: unless-stopped

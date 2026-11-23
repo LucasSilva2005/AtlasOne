@@ -29,6 +29,7 @@ foreach ($variable in $required) {
 
 Write-Host "Variáveis carregadas!" -ForegroundColor Green
 Write-Host "URL JDBC configurada: $($env:DB_URL.StartsWith('jdbc:'))" -ForegroundColor Green
+Write-Host "Usuário PostgreSQL configurado: [$env:DB_USER]" -ForegroundColor Green
 Write-Host "Iniciando AtlasOne..." -ForegroundColor Cyan
 
 & "$PSScriptRoot\mvnw.cmd" spring-boot:run

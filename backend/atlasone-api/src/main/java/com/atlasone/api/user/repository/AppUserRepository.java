@@ -14,4 +14,10 @@ public interface AppUserRepository extends JpaRepository<AppUser, UUID> {
             String email,
             String status
     );
+
+    Optional<AppUser> findByOrganizationIdAndIdAndStatus(
+            UUID organizationId,
+            UUID id,
+            String status
+    );
 }

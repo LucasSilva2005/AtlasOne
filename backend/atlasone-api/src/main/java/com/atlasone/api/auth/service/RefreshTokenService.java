@@ -48,7 +48,7 @@ public class RefreshTokenService {
     }
 
     @Transactional(noRollbackFor = RefreshTokenReuseException.class)
-    public String rotateRefreshToken(String rawToken) {
+    public RotatedRefreshToken rotateRefreshToken(String rawToken) {
 
         String tokenHash = hashToken(rawToken);
 
@@ -96,7 +96,11 @@ public class RefreshTokenService {
                 newToken.getId()
         );
 
-        return newRawToken;
+        return new RotatedRefreshToken(
+        currentToken.getOrganizationId(),
+        currentToken.getUserId(),
+        newRawToken
+);
     }
 
     private String createAndSaveToken(

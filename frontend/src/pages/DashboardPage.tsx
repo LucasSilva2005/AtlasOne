@@ -3,23 +3,15 @@ import {
   Activity,
   ArrowDownRight,
   ArrowUpRight,
-  Bell,
   Box,
   CalendarDays,
   CheckCircle2,
   ChevronDown,
-  CircleHelp,
   Clock3,
-  LayoutDashboard,
   MapPin,
-  Menu,
-  Package,
   Plus,
-  Search,
-  Settings,
   Truck,
   Users,
-  Wallet,
 } from 'lucide-react'
 
 import {
@@ -79,118 +71,8 @@ const deliveries = [
   },
 ]
 
-const navigation = [
-  { label: 'Visão geral', icon: LayoutDashboard, active: true },
-  { label: 'Pedidos', icon: Package },
-  { label: 'Entregas', icon: Truck },
-  { label: 'Motoristas', icon: Users },
-  { label: 'Rotas', icon: MapPin },
-]
-
-function App() {
+export default function DashboardPage() {
   return (
-    <div className="app-layout">
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-icon">
-            <Activity size={23} strokeWidth={2.5} />
-          </div>
-          <div>
-            <h1>AtlasOne</h1>
-            <span>LOGISTICS PLATFORM</span>
-          </div>
-        </div>
-
-        <div className="sidebar-section">
-          <span className="section-label">MENU PRINCIPAL</span>
-
-          <nav className="navigation">
-            {navigation.map((item) => {
-              const Icon = item.icon
-
-              return (
-                <a
-                  href="#"
-                  key={item.label}
-                  className={`nav-item ${item.active ? 'active' : ''}`}
-                  onClick={(event) => event.preventDefault()}
-                >
-                  <Icon size={19} />
-                  <span>{item.label}</span>
-                  {item.label === 'Entregas' && (
-                    <span className="nav-count">12</span>
-                  )}
-                </a>
-              )
-            })}
-          </nav>
-        </div>
-
-        <div className="sidebar-section settings-section">
-          <span className="section-label">PREFERÊNCIAS</span>
-
-          <a href="#" className="nav-item" onClick={(e) => e.preventDefault()}>
-            <Settings size={19} />
-            <span>Configurações</span>
-          </a>
-
-          <a href="#" className="nav-item" onClick={(e) => e.preventDefault()}>
-            <CircleHelp size={19} />
-            <span>Central de ajuda</span>
-          </a>
-        </div>
-
-        <div className="sidebar-bottom">
-          <div className="plan-card">
-            <div className="plan-icon">
-              <Wallet size={18} />
-            </div>
-            <strong>AtlasOne Pro</strong>
-            <p>Sua operação em um só lugar.</p>
-            <div className="plan-progress">
-              <span />
-            </div>
-            <small>Ambiente demonstrativo</small>
-          </div>
-
-          <div className="user-profile">
-            <div className="avatar">L</div>
-            <div className="user-info">
-              <strong>Lucas</strong>
-              <span>Administrador</span>
-            </div>
-            <ChevronDown size={17} />
-          </div>
-        </div>
-      </aside>
-
-      <main className="main-content">
-        <header className="topbar">
-          <div className="breadcrumb">
-            <button className="mobile-menu" aria-label="Abrir menu">
-              <Menu size={21} />
-            </button>
-            <span>Workspace</span>
-            <span className="breadcrumb-divider">/</span>
-            <strong>Visão geral</strong>
-          </div>
-
-          <div className="topbar-actions">
-            <div className="search-box">
-              <Search size={17} />
-              <input type="text" placeholder="Buscar..." />
-              <kbd>⌘ K</kbd>
-            </div>
-
-            <button className="icon-button notification-button" aria-label="Notificações">
-              <Bell size={19} />
-              <span />
-            </button>
-
-            <div className="topbar-avatar">L</div>
-          </div>
-        </header>
-
         <div className="dashboard-content">
           <section className="welcome-section">
             <div>
@@ -414,8 +296,6 @@ function App() {
             <span>Plataforma de gestão logística</span>
           </footer>
         </div>
-      </main>
-    </div>
   )
 }
 
@@ -475,5 +355,3 @@ function ProgressItem({
     </div>
   )
 }
-
-export default App

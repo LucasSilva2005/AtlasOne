@@ -982,3 +982,19 @@ button {
     flex-direction: column;
   }
 }
+
+/* MOBILE SIDEBAR */
+@media (max-width: 650px) {
+  .sidebar.sidebar-open {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 250px;
+    min-width: 250px;
+    height: 100vh;
+    overflow-y: auto;
+    box-shadow: 12px 0 35px rgba(0, 0, 0, 0.35);
+  }
+}

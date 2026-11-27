@@ -25,6 +25,8 @@ public class SecurityConfig {
             throws Exception {
 
         http
+                .cors(cors -> {})
+
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .sessionManagement(session -> session
@@ -33,22 +35,18 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // Monitoramento da aplicação
                         .requestMatchers(
                                 "/actuator/health",
                                 "/actuator/info"
                         ).permitAll()
 
-                        // Autenticação e renovação de tokens
                         .requestMatchers("/api/v1/auth/**").permitAll()
 
-                        // Rastreamento público de entregas
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/v1/public/tracking/**"
                         ).permitAll()
 
-                        // Todas as demais rotas exigem autenticação
                         .anyRequest().authenticated()
                 )
 

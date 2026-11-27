@@ -31,6 +31,7 @@ type Order = {
   date: string
   total: number
   status: OrderStatus
+  details?: OrderFormData | null
 }
 
 type OrderItem = {
@@ -177,6 +178,8 @@ export default function OrdersPage() {
   const [activeFilter, setActiveFilter] = useState<Filter>('Todos')
   const [currentPage, setCurrentPage] = useState(1)
   const [modalOpen, setModalOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [editingOrder, setEditingOrder] = useState(false)
   const [orderForm, setOrderForm] = useState<OrderFormData>(
     createEmptyOrderForm,
   )
@@ -366,6 +369,25 @@ export default function OrdersPage() {
     setCurrentPage(1)
   }
 
+  function handleEditOrder(order: Order) {
+    if (!order.details) {
+      return
+    }
+
+    setOrderForm({
+      customer: { ...order.details.customer },
+      address: { ...order.details.address },
+      order: { ...order.details.order },
+      items: order.details.items.map((item) => ({ ...item })),
+    })
+
+    setSelectedOrder(order)
+    setEditingOrder(true)
+    setCepMessage('')
+    setCepLoading(false)
+    setModalOpen(true)
+  }
+
   function handleCreateOrder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
@@ -392,6 +414,12 @@ export default function OrdersPage() {
       date: new Date().toISOString().slice(0, 10),
       total: orderTotal,
       status: 'Recebido',
+      details: {
+        customer: { ...orderForm.customer },
+        address: { ...orderForm.address },
+        order: { ...orderForm.order },
+        items: orderForm.items.map((item) => ({ ...item })),
+      },
     }
 
     setOrders((previous) => [newOrder, ...previous])
@@ -401,6 +429,52 @@ export default function OrdersPage() {
     setActiveFilter('Todos')
     setSearch('')
     setCurrentPage(1)
+    setModalOpen(false)
+  }
+
+  function handleSaveOrder(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (!selectedOrder) {
+      return
+    }
+
+    const customerName = orderForm.customer.name.trim()
+
+    const hasValidItem = orderForm.items.some((item) => {
+      return (
+        item.productName.trim() !== '' &&
+        parseMoney(item.quantity) > 0 &&
+        parseMoney(item.unitPrice) > 0
+      )
+    })
+
+    if (!customerName || !hasValidItem || orderTotal <= 0) {
+      return
+    }
+
+    const updatedOrder: Order = {
+      ...selectedOrder,
+      customer: customerName,
+      total: orderTotal,
+      details: {
+        customer: { ...orderForm.customer },
+        address: { ...orderForm.address },
+        order: { ...orderForm.order },
+        items: orderForm.items.map((item) => ({ ...item })),
+      },
+    }
+
+    setOrders((previous) =>
+      previous.map((order) =>
+        order.id === selectedOrder.id ? updatedOrder : order,
+      ),
+    )
+
+    setSelectedOrder(updatedOrder)
+    setEditingOrder(false)
+    setCepMessage('')
+    setCepLoading(false)
     setModalOpen(false)
   }
 
@@ -512,7 +586,14 @@ export default function OrdersPage() {
 
             <tbody>
               {visibleOrders.map((order) => (
-                <tr key={order.id}>
+                <tr
+                  key={order.id}
+                  className="order-row-clickable"
+                  onClick={() => {
+                    setSelectedOrder(order)
+                    setEditingOrder(false)
+                  }}
+                >
                   <td>
                     <span className="order-code">{order.code}</span>
                   </td>
@@ -582,22 +663,31 @@ export default function OrdersPage() {
           >
             <div className="order-modal-heading">
               <div>
-                <span>NOVO REGISTRO</span>
-                <h2 id="new-order-title">Cadastrar pedido</h2>
-                <p>Informe os dados básicos do pedido.</p>
+                <span>{editingOrder ? 'EDIÇÃO DE PEDIDO' : 'NOVO REGISTRO'}</span>
+                <h2 id="new-order-title">
+                  {editingOrder ? 'Editar pedido' : 'Cadastrar pedido'}
+                </h2>
+                <p>
+                  {editingOrder
+                    ? 'Altere as informações do pedido e salve as mudanças.'
+                    : 'Informe os dados básicos do pedido.'}
+                </p>
               </div>
 
               <button
+                type="button"
                 className="modal-close"
                 aria-label="Fechar"
-                onClick={() => setModalOpen(false)}
+                onClick={() => {
+                  setModalOpen(false)
+                  setEditingOrder(false)
+                }}
               >
                 <X size={20} />
               </button>
             </div>
 
-
-            <form onSubmit={handleCreateOrder}>
+            <form onSubmit={editingOrder ? handleSaveOrder : handleCreateOrder}>
               {/* DADOS DO CLIENTE */}
               <section className="form-section">
                 <h3 className="form-section-title">Dados do cliente</h3>
@@ -823,7 +913,7 @@ export default function OrdersPage() {
                   </div>
                 </div>
               </section>
-              
+
               {/* PRODUTOS DO PEDIDO */}
               <section className="form-section">
                 <h3 className="form-section-title">Produtos do pedido</h3>
@@ -989,11 +1079,123 @@ export default function OrdersPage() {
                 </button>
 
                 <button type="submit" className="confirm-order-button">
-                  Cadastrar pedido
+                  {editingOrder ? 'Salvar alterações' : 'Cadastrar pedido'}
                 </button>
               </div>
             </form>
 
+          </section>
+        </div>
+      )}
+
+      {selectedOrder && !modalOpen && (
+        <div className="order-detail-backdrop">
+          <section className="order-detail-modal">
+            <div className="order-detail-header">
+              <div>
+                <span>DETALHES DO PEDIDO</span>
+                <h2>{selectedOrder.code}</h2>
+                <p>Confira todas as informações deste pedido.</p>
+              </div>
+
+              <button
+                type="button"
+                className="modal-close"
+                aria-label="Fechar detalhes"
+                onClick={() => setSelectedOrder(null)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="order-detail-content">
+              <section className="detail-section">
+                <h3>Informações gerais</h3>
+
+                <div className="detail-grid">
+                  <p><span>Pedido</span><strong>{selectedOrder.code}</strong></p>
+                  <p><span>Data</span><strong>{formatDate(selectedOrder.date)}</strong></p>
+                  <p><span>Cliente</span><strong>{selectedOrder.customer}</strong></p>
+                  <p><span>Valor total</span><strong>{currency(selectedOrder.total)}</strong></p>
+                  <p><span>Status</span><strong><StatusBadge status={selectedOrder.status} /></strong></p>
+                </div>
+              </section>
+
+              {selectedOrder.details ? (
+                <>
+                  <section className="detail-section">
+                    <h3>Contato do cliente</h3>
+
+                    <div className="detail-grid">
+                      <p><span>Telefone / WhatsApp</span><strong>{selectedOrder.details.customer.phone || 'Não informado'}</strong></p>
+                      <p><span>E-mail</span><strong>{selectedOrder.details.customer.email || 'Não informado'}</strong></p>
+                      <p><span>CPF / CNPJ</span><strong>{selectedOrder.details.customer.document || 'Não informado'}</strong></p>
+                    </div>
+                  </section>
+
+                  <section className="detail-section">
+                    <h3>Endereço de entrega</h3>
+
+                    <div className="detail-grid">
+                      <p><span>CEP</span><strong>{selectedOrder.details.address.postalCode || 'Não informado'}</strong></p>
+                      <p><span>Logradouro</span><strong>{selectedOrder.details.address.street || 'Não informado'}, {selectedOrder.details.address.number || 'S/N'}</strong></p>
+                      <p><span>Complemento</span><strong>{selectedOrder.details.address.complement || 'Não informado'}</strong></p>
+                      <p><span>Bairro</span><strong>{selectedOrder.details.address.neighborhood || 'Não informado'}</strong></p>
+                      <p><span>Cidade / UF</span><strong>{[selectedOrder.details.address.city, selectedOrder.details.address.state].filter(Boolean).join(' / ') || 'Não informado'}</strong></p>
+                    </div>
+                  </section>
+
+                  <section className="detail-section">
+                    <h3>Produtos do pedido</h3>
+
+                    <div className="detail-products">
+                      {selectedOrder.details.items.map((item, index) => {
+                        const itemTotal = Math.max(
+                          0,
+                          parseMoney(item.quantity) * parseMoney(item.unitPrice) -
+                          parseMoney(item.discount),
+                        )
+
+                        return (
+                          <div className="detail-product" key={index}>
+                            <div>
+                              <strong>{item.productName || 'Produto sem nome'}</strong>
+                              <span>SKU: {item.sku || 'Não informado'}</span>
+                              <span>Quantidade: {item.quantity}</span>
+                            </div>
+
+                            <strong>{currency(itemTotal)}</strong>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </section>
+                </>
+              ) : (
+                <p className="detail-no-data">
+                  Este pedido de demonstração não possui informações detalhadas cadastradas.
+                </p>
+              )}
+            </div>
+
+            <div className="order-detail-actions">
+              <button
+                type="button"
+                className="cancel-order-button"
+                onClick={() => setSelectedOrder(null)}
+              >
+                Fechar
+              </button>
+
+              <button
+                type="button"
+                className="confirm-order-button"
+                disabled={!selectedOrder.details}
+                onClick={() => handleEditOrder(selectedOrder)}
+              >
+                Editar pedido
+              </button>
+            </div>
           </section>
         </div>
       )}

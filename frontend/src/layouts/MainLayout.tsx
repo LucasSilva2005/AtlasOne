@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import {
   Activity,
@@ -6,6 +5,7 @@ import {
   ChevronDown,
   CircleHelp,
   LayoutDashboard,
+  LogOut,
   MapPin,
   Menu,
   Package,
@@ -14,7 +14,8 @@ import {
   Users,
   Wallet,
 } from 'lucide-react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/useAuth'
 
 const navigation = [
   { label: 'Visão geral', path: '/', icon: LayoutDashboard },
@@ -26,6 +27,13 @@ const navigation = [
 
 export default function MainLayout() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    signOut()
+    navigate('/login', { replace: true })
+  }
 
   return (
     <div className="app-layout">
@@ -145,6 +153,15 @@ export default function MainLayout() {
             >
               <Bell size={19} />
               <span />
+            </button>
+
+            <button
+              className="icon-button"
+              aria-label="Sair da conta"
+              title="Sair da conta"
+              onClick={handleLogout}
+            >
+              <LogOut size={19} />
             </button>
 
             <div className="topbar-avatar">L</div>

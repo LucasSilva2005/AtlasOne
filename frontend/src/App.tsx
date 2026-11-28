@@ -3,11 +3,25 @@
 import MainLayout from './layouts/MainLayout'
 import DashboardPage from './pages/DashboardPage'
 import OrdersPage from './pages/OrdersPage'
+import LoginPage from './pages/LoginPage'
+import { useAuth } from './contexts/useAuth'
+
+function ProtectedRoutes() {
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  return <MainLayout />
+}
 
 function App() {
   return (
     <Routes>
-      <Route element={<MainLayout />}>
+      <Route path="/login" element={<LoginPage />} />
+
+      <Route element={<ProtectedRoutes />}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/pedidos" element={<OrdersPage />} />
         <Route path="/entregas" element={<PlaceholderPage title="Entregas" />} />

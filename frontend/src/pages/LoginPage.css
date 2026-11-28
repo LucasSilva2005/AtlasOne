@@ -11,13 +11,21 @@
 }
 
 .login-card {
+  position: relative;
+  z-index: 1;
+
   width: 100%;
   max-width: 440px;
   padding: 42px;
-  background: #101f33;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(16, 31, 51, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 18px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .login-brand {
@@ -89,13 +97,20 @@
   width: 100%;
   height: 48px;
   padding: 0 14px;
-  border: 1px solid #263951;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 9px;
   outline: none;
-  background: #071426;
+
+  background: rgba(7, 20, 38, 0.25);
   color: #ffffff;
+
   font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  transition: all 0.2s;
 }
 
 .login-form input::placeholder {
@@ -104,7 +119,8 @@
 
 .login-form input:focus {
   border-color: #087bff;
-  box-shadow: 0 0 0 3px rgba(8, 123, 255, 0.13);
+  background: rgba(7, 20, 38, 0.68);
+  box-shadow: 0 0 0 3px rgba(8, 123, 255, 0.18);
 }
 
 .login-form button {
@@ -159,4 +175,34 @@
   .login-heading h2 {
     font-size: 22px;
   }
+}
+
+
+/* Marca d'água do AtlasOne */
+.login-page {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background-image: url('/images/logo.jpeg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: min(75vw, 850px);
+
+  opacity: 0.1;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Mantém o formulário acima da marca d'água */
+.login-card {
+  position: relative;
+  z-index: 1;
 }
